@@ -182,7 +182,7 @@ def get_overall_learning_data():
             # 获取各板块学习情况
             module_stats = session.run("""
                 MATCH (m:glx_Module)
-                OPTIONAL MATCH (m)-[:CONTAINS]->(c:glx_Chapter)-[:CONTAINS]->(k:glx_Knowledge)
+                OPTIONAL MATCH (m)-[:HAS_CHAPTER]->(c:glx_Chapter)-[:HAS_KNOWLEDGE]->(k:glx_Knowledge)
                 WITH m, count(DISTINCT k) as kp_count, count(DISTINCT c) as chapter_count
                 OPTIONAL MATCH (s:mfx_Student)-[:PERFORMED]->(a:mfx_Activity)
                 WHERE a.module_name = m.name

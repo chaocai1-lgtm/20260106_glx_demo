@@ -61,7 +61,7 @@ def get_all_chapters():
         driver = get_neo4j_driver()
         with driver.session() as session:
             result = session.run("""
-                MATCH (m:glx_Module)-[:CONTAINS]->(c:glx_Chapter)
+                MATCH (m:glx_Module)-[:HAS_CHAPTER]->(c:glx_Chapter)
                 RETURN m.name as module_name, c.id as chapter_id, c.name as chapter_name
                 ORDER BY m.id, c.id
             """)
@@ -80,7 +80,7 @@ def get_chapter_knowledge_points(chapter_id):
         driver = get_neo4j_driver()
         with driver.session() as session:
             result = session.run("""
-                MATCH (c:glx_Chapter {id: $chapter_id})-[:CONTAINS]->(k:glx_Knowledge)
+                MATCH (c:glx_Chapter {id: $chapter_id})-[:HAS_KNOWLEDGE]->(k:glx_Knowledge)
                 RETURN k.name as name, k.importance as importance
                 ORDER BY k.importance DESC
             """, chapter_id=chapter_id)
