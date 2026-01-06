@@ -9,24 +9,6 @@ venv/
 ENV/
 *.egg-info/
 
-# 测试和调试文件
-test_*.py
-*_test.py
-check_*.py
-debug_*.py
-fix_*.py
-
-# 部署测试（保留在仓库中供用户测试）
-# test_deployment.py
-
-# 文档文件（仅本地使用）
-README.md
-*.md
-
-# 本地部署/初始化脚本（不发布）
-scripts/init_*.py
-.streamlit/secrets.toml.example
-
 # 临时文件
 *.env
 .env
@@ -35,10 +17,6 @@ temp_*
 *.log
 *.bak
 *_backup.*
-
-# 数据备份和测试
-*_backup.json
-*_test.json
 
 # IDE
 .vscode/
@@ -52,5 +30,8 @@ Thumbs.db
 
 # Streamlit - 敏感配置文件（本地使用）
 .streamlit/secrets.toml
-.deployment/
-streamlit_deploy_guide.md
+
+# 敏感配置文件 - 防止敏感信息泄露
+config/secrets.py
+*.env
+.env.local

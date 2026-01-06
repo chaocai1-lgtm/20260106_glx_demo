@@ -36,21 +36,18 @@ def get_secret(key, default=None):
     # 最后使用默认值
     return default
 
-# Neo4j配置 - 阿里云私有版
-NEO4J_URI = get_secret("NEO4J_URI", "bolt://")
-NEO4J_USERNAME = get_secret("NEO4J_USERNAME", "neo4j")
-NEO4J_PASSWORD = get_secret("NEO4J_PASSWORD", "")
+# Neo4j配置 - 必须在Streamlit secrets中配置
+NEO4J_URI = get_secret("NEO4J_URI")
+NEO4J_USERNAME = get_secret("NEO4J_USERNAME")
+NEO4J_PASSWORD = get_secret("NEO4J_PASSWORD")
 
-# Elasticsearch配置
-ELASTICSEARCH_CLOUD_ID = get_secret(
-    "ELASTICSEARCH_CLOUD_ID",
-    ":dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyQ1ZTRhNGI5ZGNlZjc0NDI4YjI3MWEzZDg3YzRmZjY2OCRlZjhhODRlYjliNzc0YjM3ODk0NWQ3ZTQ3OWVkOWRkNQ=="
-)
-ELASTICSEARCH_USERNAME = get_secret("ELASTICSEARCH_USERNAME", "elastic")
-ELASTICSEARCH_PASSWORD = get_secret("ELASTICSEARCH_PASSWORD", "")
+# Elasticsearch配置 - 必须在Streamlit secrets中配置
+ELASTICSEARCH_CLOUD_ID = get_secret("ELASTICSEARCH_CLOUD_ID")
+ELASTICSEARCH_USERNAME = get_secret("ELASTICSEARCH_USERNAME")
+ELASTICSEARCH_PASSWORD = get_secret("ELASTICSEARCH_PASSWORD")
 
-# DeepSeek API配置
-DEEPSEEK_API_KEY = get_secret("DEEPSEEK_API_KEY", "")
+# DeepSeek API配置 - 必须在Streamlit secrets中配置
+DEEPSEEK_API_KEY = get_secret("DEEPSEEK_API_KEY")
 DEEPSEEK_BASE_URL = "https://api.deepseek.com/v1"
 
 # 应用配置
