@@ -310,72 +310,56 @@ def render_case_library():
                 st.markdown(f'<div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border-left: 4px solid #4caf50; white-space: pre-line;">{selected_case["auxiliary_examination"]}</div>', unsafe_allow_html=True)
         
         with tab2:
-            st.markdown("#### 🏥 临床诊断")
+            st.markdown("#### 🔍 管理分析")
             st.success(f"**{selected_case['diagnosis']}**")
             
-            # 详细诊断分析
-            diagnosis_analysis = selected_case.get('diagnosis_analysis', {})
-            
-            if diagnosis_analysis:
+            # 管理检查结果
+            if 'examination' in selected_case:
+                st.markdown("#### 📊 管理诊断")
+                examination = selected_case['examination']
+                
+                # 创建两列布局
                 col1, col2 = st.columns(2)
                 
                 with col1:
-                    # 临床检查发现
-                    if 'clinical_exam' in diagnosis_analysis:
-                        exam = diagnosis_analysis['clinical_exam']
-                        st.markdown(f"#### 🔍 {exam['title']}")
-                        for item in exam['items']:
-                            st.markdown(f"""
-                            <div style="background: #e8f5e9; padding: 8px 12px; margin: 4px 0; border-radius: 5px; border-left: 3px solid #4caf50;">
-                                ✓ {item}
-                            </div>
-                            """, unsafe_allow_html=True)
-                    st.subheader("管理分类")
-            st.success(f"**{selected_case['diagnosis']}**")
-            
-            # 详细管理分析
-            diagnosis_analysis = selected_case.get('diagnosis_analysis', {})
-            
-            if diagnosis_analysis:
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    # 情况调查
-                    if 'clinical_exam' in diagnosis_analysis:
-                        exam = diagnosis_analysis['clinical_exam']
-                        st.markdown(f"#### 🔍 {exam.get('title', '情况调查')}")
-                        items = exam.get('items', [])
-                        for item in items:
-                            if item:
-                                st.markdown(f'<div style="background: #e8f5e9; padding: 8px 12px; margin: 4px 0; border-radius: 5px; border-left: 3px solid #4caf50;">✓ {item}</div>', unsafe_allow_html=True)
-                    
-                    # 理论分析
-                    if 'radiographic' in diagnosis_analysis:
-                        st.markdown("")
-                        xray = diagnosis_analysis['radiographic']
-                        st.markdown(f"#### 📚 {xray.get('title', '理论分析')}")
-                        items = xray.get('items', [])
-                        for item in items:
-                            if item:
-                                st.markdown(f'<div style="background: #e3f2fd; padding: 8px 12px; margin: 4px 0; border-radius: 5px; border-left: 3px solid #2196f3;">📋 {item}</div>', unsafe_allow_html=True)
+                    if 'organizational_structure' in examination:
+                        st.markdown(f'<div style="background: #e8f5e9; padding: 10px; margin: 5px 0; border-radius: 5px; border-left: 3px solid #4caf50;"><strong>🏢 组织结构：</strong>{examination["organizational_structure"]}</div>', unsafe_allow_html=True)
+                    if 'management_system' in examination:
+                        st.markdown(f'<div style="background: #e3f2fd; padding: 10px; margin: 5px 0; border-radius: 5px; border-left: 3px solid #2196f3;"><strong>📋 管理制度：</strong>{examination["management_system"]}</div>', unsafe_allow_html=True)
+                    if 'financial_control' in examination:
+                        st.markdown(f'<div style="background: #fff3e0; padding: 10px; margin: 5px 0; border-radius: 5px; border-left: 3px solid #ff9800;"><strong>💰 财务管控：</strong>{examination["financial_control"]}</div>', unsafe_allow_html=True)
                 
                 with col2:
-                    # 相关知识
-                    if 'differential' in diagnosis_analysis:
-                        diff = diagnosis_analysis['differential']
-                        st.markdown(f"#### 💡 {diff.get('title', '相关知识')}")
+                    if 'hr_system' in examination:
+                        st.markdown(f'<div style="background: #fce4ec; padding: 10px; margin: 5px 0; border-radius: 5px; border-left: 3px solid #e91e63;"><strong>👥 人力资源：</strong>{examination["hr_system"]}</div>', unsafe_allow_html=True)
+                    if 'decision_making' in examination:
+                        st.markdown(f'<div style="background: #f3e5f5; padding: 10px; margin: 5px 0; border-radius: 5px; border-left: 3px solid #9c27b0;"><strong>⚖️ 决策机制：</strong>{examination["decision_making"]}</div>', unsafe_allow_html=True)
+                    if 'technology_level' in examination:
+                        st.markdown(f'<div style="background: #e0f2f1; padding: 10px; margin: 5px 0; border-radius: 5px; border-left: 3px solid #009688;"><strong>🔧 技术水平：</strong>{examination["technology_level"]}</div>', unsafe_allow_html=True)
+            
+            # 阶段与严重度分析
+            if 'stage_grade_analysis' in selected_case:
+                st.markdown("")
+                st.markdown("#### 📈 问题分析")
+                stage_analysis = selected_case['stage_grade_analysis']
                 
-                st.markdown("#### 💡 诊断要点")
-                key_points = ensure_list(
-                    selected_case.get('key_points'),
-                    ['注意病史采集', '仔细临床检查', '辅助检查分析']
-                )
-                for i, point in enumerate(key_points, 1):
-                    st.markdown(f"""
-                    <div style="background: #e7f3ff; padding: 10px; margin: 5px 0; border-radius: 5px; border-left: 3px solid #0066cc;">
-                        <strong>{i}.</strong> {point}
-                    </div>
-                    """, unsafe_allow_html=True)
+                col1, col2 = st.columns(2)
+                with col1:
+                    if 'stage' in stage_analysis:
+                        st.markdown(f'<div style="background: #e1f5fe; padding: 12px; border-radius: 8px; border-left: 4px solid #0288d1;"><strong>📊 发展阶段：</strong><br>{stage_analysis["stage"]}</div>', unsafe_allow_html=True)
+                with col2:
+                    if 'grade' in stage_analysis:
+                        st.markdown(f'<div style="background: #fff9c4; padding: 12px; border-radius: 8px; border-left: 4px solid #fbc02d;"><strong>⚠️ 严重程度：</strong><br>{stage_analysis["grade"]}</div>', unsafe_allow_html=True)
+            
+            # 管理要点
+            st.markdown("")
+            st.markdown("#### 💡 管理要点")
+            key_points = ensure_list(
+                selected_case.get('key_points'),
+                ['识别核心问题', '分析关键因素', '制定解决方案']
+            )
+            for i, point in enumerate(key_points, 1):
+                st.markdown(f'<div style="background: #e7f3ff; padding: 12px; margin: 8px 0; border-radius: 8px; border-left: 4px solid #0066cc;"><strong>{i}.</strong> {point}</div>', unsafe_allow_html=True)
         
         with tab3:
             st.markdown("#### � 解决方案")
