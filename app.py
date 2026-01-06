@@ -1819,11 +1819,11 @@ def render_system_settings():
         
         with col1:
             case_count = st.number_input(
-                "📚 病例总数", 
+                "📚 案例总数", 
                 min_value=0, 
                 value=stats.get("case_count", 12),
                 step=1,
-                help="设置系统中的病例总数"
+                help="设置系统中的案例总数"
             )
         
         with col2:
@@ -1869,7 +1869,7 @@ def render_system_settings():
         st.markdown(f"""
         <div class="stat-card">
             <div class="stat-number">{stats.get('case_count', 12)}</div>
-            <div class="stat-label">📚 病例总数</div>
+            <div class="stat-label">📚 案例总数</div>
         </div>
         """, unsafe_allow_html=True)
     with preview_cols[1]:

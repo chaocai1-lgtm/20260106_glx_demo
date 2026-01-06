@@ -64,7 +64,7 @@ def log_case_activity(activity_type, case_id=None, case_title=None, details=None
     )
 
 def search_cases(query="", difficulty=None):
-    """搜索病例（仅本地开发可用，云端返回None）"""
+    """搜索案例（仅本地开发可用，云端返回None）"""
     # 云端部署时跳过Elasticsearch
     if not HAS_ELASTICSEARCH or not ELASTICSEARCH_CLOUD_ID:
         return None
@@ -105,7 +105,7 @@ def search_cases(query="", difficulty=None):
         return []
 
 def get_case_detail(case_id):
-    """从Neo4j获取病例详情"""
+    """从Neo4j获取案例详情"""
     if not check_neo4j_available():
         return None
     
@@ -113,7 +113,7 @@ def get_case_detail(case_id):
         driver = get_neo4j_driver()
         
         with driver.session() as session:
-            # 获取病例基本信息
+            # 获取案例基本信息
             result = session.run("""
                 MATCH (c:mfx_Case {id: $case_id})
                 RETURN c
@@ -224,18 +224,18 @@ def render_case_library():
         options=list(case_options.keys()),
         index=0,
         label_visibility="collapsed",
-        help="从下拉列表中选择一个病例进行深入学习"
+        help="从下拉列表中选择一个案例进行深入学习"
     )
     
     selected_case = case_options.get(selected_case_name)
     
     if selected_case:
-        # 记录查看病例
-        log_case_activity("查看病例", case_id=selected_case['id'], case_title=selected_case['title'])
+        # 记录查看案例
+        log_case_activity("查看案例", case_id=selected_case['id'], case_title=selected_case['title'])
         
         st.divider()
         
-        # 病例头部信息卡片
+        # 案例头部信息卡片
         difficulty_colors = {"简单": "#28a745", "中等": "#ffc107", "困难": "#dc3545"}
         diff_color = difficulty_colors.get(selected_case['difficulty'], "#6c757d")
         
