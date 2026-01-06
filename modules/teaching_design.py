@@ -196,9 +196,6 @@ def render_teaching_design():
     
     # 获取所有章节
     chapters = get_all_chapters()
-    if not chapters:
-        st.warning("暂无章节数据，请先初始化知识图谱")
-        return
     
     # 布局
     col1, col2 = st.columns(2)
@@ -206,40 +203,44 @@ def render_teaching_design():
     with col1:
         st.markdown("### 📚 选择教学内容")
         
-        # 按模块分组章节
-        module_chapters = {}
-        for ch in chapters:
-            module = ch['module_name']
-            if module not in module_chapters:
-                module_chapters[module] = []
-            module_chapters[module].append(ch)
-        
-        # 先选择模块
-        module_names = list(module_chapters.keys())
-        selected_module = st.selectbox("选择篇章模块", module_names)
-        
-        # 再选择章节
-        if selected_module:
-            chapter_list = module_chapters[selected_module]
-            chapter_options = [ch['chapter_name'] for ch in chapter_list]
-            selected_chapter_name = st.selectbox("选择具体章节", chapter_options)
+        if not chapters:
+            st.warning("📚 暂无章节数据\n\n请点击【数据管理】→【初始化知识图谱】进行数据初始化，或使用管理员工具导入管理学知识图谱数据。")
+            st.selectbox("选择篇章模块", ["暂无数据"], disabled=True)
+        else:
+            # 按模块分组章节
+            module_chapters = {}
+            for ch in chapters:
+                module = ch['module_name']
+                if module not in module_chapters:
+                    module_chapters[module] = []
+                module_chapters[module].append(ch)
             
-            # 获取章节ID
-            selected_chapter = next((ch for ch in chapter_list if ch['chapter_name'] == selected_chapter_name), None)
+            # 先选择模块
+            module_names = list(module_chapters.keys())
+            selected_module = st.selectbox("选择篇章模块", module_names)
             
-            if selected_chapter:
-                # 显示该章节的知识点
-                knowledge_points = get_chapter_knowledge_points(selected_chapter['chapter_id'])
-                if knowledge_points:
-                    st.markdown("**包含知识点：**")
-                    for kp in knowledge_points:
-                        importance = kp.get('importance', 80)
-                        if importance >= 100:
-                            st.markdown(f"- 🔴 {kp['name']}（核心）")
-                        elif importance >= 90:
-                            st.markdown(f"- 🟠 {kp['name']}（重要）")
-                        else:
-                            st.markdown(f"- 🟢 {kp['name']}")
+            # 再选择章节
+            if selected_module:
+                chapter_list = module_chapters[selected_module]
+                chapter_options = [ch['chapter_name'] for ch in chapter_list]
+                selected_chapter_name = st.selectbox("选择具体章节", chapter_options)
+                
+                # 获取章节ID
+                selected_chapter = next((ch for ch in chapter_list if ch['chapter_name'] == selected_chapter_name), None)
+                
+                if selected_chapter:
+                    # 显示该章节的知识点
+                    knowledge_points = get_chapter_knowledge_points(selected_chapter['chapter_id'])
+                    if knowledge_points:
+                        st.markdown("**包含知识点：**")
+                        for kp in knowledge_points:
+                            importance = kp.get('importance', 80)
+                            if importance >= 100:
+                                st.markdown(f"- 🔴 {kp['name']}（核心）")
+                            elif importance >= 90:
+                                st.markdown(f"- 🟠 {kp['name']}（重要）")
+                            else:
+                                st.markdown(f"- 🟢 {kp['name']}")
     
     with col2:
         st.markdown("### 🎯 选择教学方法")
