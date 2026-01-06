@@ -1,6 +1,6 @@
 ﻿"""
-案例库模块
-提供病例浏览、搜索和详情查看功能
+案例库模块（管理学）
+提供管理学案例浏览、搜索和详情查看功能
 """
 
 import streamlit as st
@@ -139,71 +139,52 @@ def get_case_detail(case_id):
 
 
 def adapt_case_for_display(case):
-    """??????????????????"""
-    # ????????????????
+    """将管理学案例数据转换为显示格式"""
+    # 如果已经是标准格式，直接返回
     if "diagnosis" in case and "chief_complaint" in case:
         return case
     
-    # ???/???????
+    # 新格式案例需要转换
     adapted = case.copy()
     
-    # ?????
-    adapted["title"] = case.get("title", "?????")
-    adapted["difficulty"] = case.get("difficulty", "??")
+    # 基本信息
+    adapted["title"] = case.get("title", "未命名案例")
+    adapted["difficulty"] = case.get("difficulty", "中等")
     
-    # ??????
-    adapted["chief_complaint"] = case.get("case_info", "")  # 基本情况
+    # 核心字段映射
+    adapted["chief_complaint"] = case.get("case_info", "")  # 案例背景
     adapted["diagnosis"] = f"{case.get('category', '')} - {case.get('subcategory', '')}"  # 分类
     adapted["symptoms"] = case.get("keywords", [])  # 关键词
     
-    # 诊断分析
+    # 分析内容结构
     adapted["diagnosis_analysis"] = {
         "clinical_exam": {
-            "title": "现状调查",
+            "title": "案例背景",
             "items": [case.get("case_info", "")]
         },
         "radiographic": {
-            "title": "数据分析",
+            "title": "案例分析",
             "items": [case.get("court_opinion", "")]
         },
         "differential": {
-            "title": "相关理论",
+            "title": "相关知识",
             "items": case.get("related_knowledge", [])
         }
     }
     
-    # 问题分析
+    # 讨论问题
     adapted["questions"] = case.get("questions", [])
     
     return adapted
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
-def adapt_case_for_display(case):
-    """适配案例数据格式以便展示"""
-    if "diagnosis" in case and "chief_complaint" in case:
-        return case
-    
-    adapted = case.copy()
-    adapted["title"] = case.get("title", "企业案例")
-    adapted["difficulty"] = case.get("difficulty", "中等")
-    adapted["chief_complaint"] = case.get("case_info", "")
-    adapted["diagnosis"] = f"{case.get('category', '')} - {case.get('subcategory', '')}"
-    adapted["symptoms"] = case.get("keywords", [])
-    adapted["diagnosis_analysis"] = {
-        "clinical_exam": {"title": "现状调查", "items": [case.get("case_info", "")]},
-        "radiographic": {"title": "数据分析/问题识别", "items": [case.get("court_opinion", "")]},
-        "differential": {"title": "相关理论", "items": case.get("related_knowledge", [])}
-    }
-    adapted["questions"] = case.get("questions", [])
-    return adapted
-
 def get_all_sample_cases():
-    """获取所有案例数据（从data/cases.py模块读取）"""
+    """从data/cases.py获取管理学案例"""
     try:
         from data.cases import get_cases
         cases = get_cases()
-        # 适配展示
+        # 转换格式
         adapted_cases = [adapt_case_for_display(case) for case in cases]
         return adapted_cases
     except Exception as e:
@@ -211,7 +192,7 @@ def get_all_sample_cases():
         return []
 
 def render_case_library():
-    """渲染案例库页面"""
+    """渲染管理学案例库页面"""
     st.title("📚 管理学案例学习中心")
     
     # 初始化session_state以减少刷新
@@ -226,12 +207,12 @@ def render_case_library():
     
     st.markdown("""
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; color: white; margin-bottom: 20px;">
-        <h3 style="margin: 0; color: white;">📊 管理学教学案例库</h3>
-        <p style="margin: 10px 0 0 0; opacity: 1; color: white;">通过真实企业管理案例学习，掌握管理决策与实施的核心技能</p>
+        <h3 style="margin: 0; color: white;">📚 管理学案例库</h3>
+        <p style="margin: 10px 0 0 0; opacity: 0.9;">通过真实管理案例学习，掌握管理理论与实践的核心技能</p>
     </div>
     """, unsafe_allow_html=True)
     
-    # 获取所有病例供选择（使用缓存数据）
+    # 获取所有案例供选择（使用缓存数据）
     all_cases = get_all_sample_cases()
     
     # 案例选择区
@@ -249,8 +230,8 @@ def render_case_library():
     selected_case = case_options.get(selected_case_name)
     
     if selected_case:
-        # 记录查看案例
-        log_case_activity("查看案例", case_id=selected_case['id'], case_title=selected_case['title'])
+        # 记录查看病例
+        log_case_activity("查看病例", case_id=selected_case['id'], case_title=selected_case['title'])
         
         st.divider()
         
@@ -277,89 +258,69 @@ def render_case_library():
         
         st.markdown("")
         
-        # 患者信息
+        # 案例信息（如果有）
         if 'patient_info' in selected_case:
             patient = selected_case['patient_info']
             col1, col2, col3, col4 = st.columns(4)
             with col1:
-                st.markdown(f"**👤 年龄：** {patient.get('age', '-')}岁")
+                st.markdown(f"**🏢 企业规模：** {patient.get('age', '-')}")
             with col2:
-                st.markdown(f"**⚥ 性别：** {patient.get('gender', '-')}")
+                st.markdown(f"**🏭 行业类型：** {patient.get('gender', '-')}")
             with col3:
-                st.markdown(f"**💼 职业：** {patient.get('occupation', '-')}")
+                st.markdown(f"**📍 所在地区：** {patient.get('occupation', '-')}")
             with col4:
                 st.markdown(f"**📋 案例编号：** {selected_case['id']}")
         
         # 使用选项卡组织内容
-        tab1, tab2, tab3, tab4 = st.tabs(["📋 案例背景", "🔍 问题分析", "💡 解决方案", "📝 学习要点"])
+        tab1, tab2, tab3, tab4 = st.tabs(["📋 案例背景", "🔍 管理分析", "💡 解决方案", "📝 学习要点"])
         
         with tab1:
-            # 基本情况
-            st.markdown("#### 📢 基本情况")
+            # 案例概述
+            st.markdown("#### 📢 案例概述")
             st.info(selected_case['chief_complaint'])
             
-            # 企业背景
+            # 案例情境
             if 'present_illness' in selected_case:
-                st.markdown("#### 📖 企业背景")
-                st.markdown(f"""
-                <div style="background: #fff3e0; padding: 15px; border-radius: 8px; border-left: 4px solid #ff9800; white-space: pre-line;">
-                {selected_case['present_illness']}
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown("#### 📖 案例情境")
+                st.markdown(f'<div style="background: #fff3e0; padding: 15px; border-radius: 8px; border-left: 4px solid #ff9800; white-space: pre-line;">{selected_case["present_illness"]}</div>', unsafe_allow_html=True)
             
             col1, col2 = st.columns(2)
             with col1:
-                st.markdown("#### 📋 企业基本信息")
-                medical_history = selected_case.get('medical_history', '企业发展历程良好，无重大危机事件')
-                st.markdown(f"""
-                <div style="background: #fce4ec; padding: 15px; border-radius: 8px; border-left: 4px solid #e91e63; white-space: pre-line;">
-                {medical_history}
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown("#### 📋 企业背景")
+                medical_history = selected_case.get('medical_history', '企业基本情况良好，处于正常运营状态')
+                st.markdown(f'<div style="background: #fce4ec; padding: 15px; border-radius: 8px; border-left: 4px solid #e91e63; white-space: pre-line;">{medical_history}</div>', unsafe_allow_html=True)
             
             with col2:
-                st.markdown("#### 🔍 主要问题")
+                st.markdown("#### 🔍 关键问题")
                 symptoms = selected_case['symptoms']
                 if isinstance(symptoms, list):
                     for s in symptoms:
-                        st.markdown(f"""
-                        <div style="background: #e3f2fd; padding: 8px 12px; margin: 4px 0; border-radius: 5px; border-left: 3px solid #2196f3;">
-                            • {s}
-                        </div>
-                        """, unsafe_allow_html=True)
+                        st.markdown(f'<div style="background: #e3f2fd; padding: 8px 12px; margin: 4px 0; border-radius: 5px; border-left: 3px solid #2196f3;">• {s}</div>', unsafe_allow_html=True)
                 else:
                     st.markdown(symptoms)
             
-            # 管理现状（新增）
+            # 管理挑战（新增）
             if 'clinical_manifestation' in selected_case:
-                st.markdown("#### 🔬 管理现状")
-                st.markdown(f"""
-                <div style="background: #f3e5f5; padding: 15px; border-radius: 8px; border-left: 4px solid #9c27b0; white-space: pre-line;">
-                {selected_case['clinical_manifestation']}
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown("#### 🎯 管理挑战")
+                st.markdown(f'<div style="background: #f3e5f5; padding: 15px; border-radius: 8px; border-left: 4px solid #9c27b0; white-space: pre-line;">{selected_case["clinical_manifestation"]}</div>', unsafe_allow_html=True)
             
-            # 数据分析（新增）
+            # 数据与分析（新增）
             if 'auxiliary_examination' in selected_case:
-                st.markdown("#### 🩻 数据分析")
-                st.markdown(f"""
-                <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border-left: 4px solid #4caf50; white-space: pre-line;">
-                {selected_case['auxiliary_examination']}
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown("#### 📊 数据与分析")
+                st.markdown(f'<div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border-left: 4px solid #4caf50; white-space: pre-line;">{selected_case["auxiliary_examination"]}</div>', unsafe_allow_html=True)
         
         with tab2:
-            st.markdown("#### 🎯 核心问题识别")
+            st.markdown("#### 🏥 临床诊断")
             st.success(f"**{selected_case['diagnosis']}**")
             
-            # 详细问题分析
+            # 详细诊断分析
             diagnosis_analysis = selected_case.get('diagnosis_analysis', {})
             
             if diagnosis_analysis:
                 col1, col2 = st.columns(2)
                 
                 with col1:
-                    # 现状调查发现
+                    # 临床检查发现
                     if 'clinical_exam' in diagnosis_analysis:
                         exam = diagnosis_analysis['clinical_exam']
                         st.markdown(f"#### 🔍 {exam['title']}")
@@ -369,48 +330,45 @@ def render_case_library():
                                 ✓ {item}
                             </div>
                             """, unsafe_allow_html=True)
+                    st.subheader("管理分类")
+            st.success(f"**{selected_case['diagnosis']}**")
+            
+            # 详细管理分析
+            diagnosis_analysis = selected_case.get('diagnosis_analysis', {})
+            
+            if diagnosis_analysis:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    # 情况调查
+                    if 'clinical_exam' in diagnosis_analysis:
+                        exam = diagnosis_analysis['clinical_exam']
+                        st.markdown(f"#### 🔍 {exam.get('title', '情况调查')}")
+                        items = exam.get('items', [])
+                        for item in items:
+                            if item:
+                                st.markdown(f'<div style="background: #e8f5e9; padding: 8px 12px; margin: 4px 0; border-radius: 5px; border-left: 3px solid #4caf50;">✓ {item}</div>', unsafe_allow_html=True)
                     
-                    # 数据分析
+                    # 理论分析
                     if 'radiographic' in diagnosis_analysis:
                         st.markdown("")
                         xray = diagnosis_analysis['radiographic']
-                        st.markdown(f"#### 📊 {xray['title']}")
-                        for item in xray['items']:
-                            st.markdown(f"""
-                            <div style="background: #e3f2fd; padding: 8px 12px; margin: 4px 0; border-radius: 5px; border-left: 3px solid #2196f3;">
-                                📋 {item}
-                            </div>
-                            """, unsafe_allow_html=True)
+                        st.markdown(f"#### 📚 {xray.get('title', '理论分析')}")
+                        items = xray.get('items', [])
+                        for item in items:
+                            if item:
+                                st.markdown(f'<div style="background: #e3f2fd; padding: 8px 12px; margin: 4px 0; border-radius: 5px; border-left: 3px solid #2196f3;">📋 {item}</div>', unsafe_allow_html=True)
                 
                 with col2:
-                    # 对比分析
+                    # 相关知识
                     if 'differential' in diagnosis_analysis:
                         diff = diagnosis_analysis['differential']
-                        st.markdown(f"#### ⚖️ {diff['title']}")
-                        for item in diff['items']:
-                            st.markdown(f"""
-                            <div style="background: #fff3e0; padding: 8px 12px; margin: 4px 0; border-radius: 5px; border-left: 3px solid #ff9800;">
-                                💭 {item}
-                            </div>
-                            """, unsafe_allow_html=True)
-                    
-                    # 问题程度分析
-                    if 'staging' in diagnosis_analysis:
-                        st.markdown("")
-                        staging = diagnosis_analysis['staging']
-                        st.markdown(f"#### 📊 {staging['title']}")
-                        # 使用white-space: pre-line保留换行格式
-                        st.markdown(f"""
-                        <div style="background: #f3e5f5; padding: 15px; border-radius: 8px; border: 1px solid #9c27b0; white-space: pre-line; line-height: 1.8;">
-                            {staging['content']}
-                        </div>
-                        """, unsafe_allow_html=True)
-            else:
-                # 如果没有详细分析，显示简要分析要点
-                st.markdown("#### 📊 关键发现")
+                        st.markdown(f"#### 💡 {diff.get('title', '相关知识')}")
+                
+                st.markdown("#### 💡 诊断要点")
                 key_points = ensure_list(
                     selected_case.get('key_points'),
-                    ['理解问题背景与成因', '分析关键影响因素', '识别核心管理矛盾']
+                    ['注意病史采集', '仔细临床检查', '辅助检查分析']
                 )
                 for i, point in enumerate(key_points, 1):
                     st.markdown(f"""
@@ -420,10 +378,10 @@ def render_case_library():
                     """, unsafe_allow_html=True)
         
         with tab3:
-            st.markdown("#### � 实施方案")
+            st.markdown("#### � 解决方案")
             treatment = ensure_list(
                 selected_case.get('treatment_plan'), 
-                ['现状分析', '方案制定', '实施跟踪']
+                ['问题诊断', '方案设计', '实施建议']
             )
             
             current_phase = None
@@ -433,30 +391,15 @@ def render_case_library():
                 # 检测是否是阶段标题（包含【】）
                 if step.startswith('【') and '】' in step:
                     current_phase = step
-                    st.markdown(f"""
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                                color: white; padding: 12px 20px; margin: 15px 0 10px 0; border-radius: 8px;">
-                        <strong>{step}</strong>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f'<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 20px; margin: 15px 0 10px 0; border-radius: 8px;"><strong>{step}</strong></div>', unsafe_allow_html=True)
                 else:
                     step_count += 1
-                    st.markdown(f"""
-                    <div style="background: #f5f5f5; padding: 12px 15px; margin: 5px 0 5px 20px; 
-                                border-radius: 8px; border-left: 4px solid #4ECDC4;">
-                        {step}
-                    </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f'<div style="background: #f5f5f5; padding: 12px 15px; margin: 5px 0 5px 20px; border-radius: 8px; border-left: 4px solid #4ECDC4;">{step}</div>', unsafe_allow_html=True)
             
-            # 治疗注意事项（新增字段）
+            # 实施建议（新增字段）
             if 'treatment_notes' in selected_case:
-                st.markdown("#### ⚠️ 治疗注意事项")
-                st.markdown(f"""
-                <div style="background: #fff8e1; padding: 15px; margin: 10px 0; 
-                            border-radius: 8px; border-left: 4px solid #ffc107; white-space: pre-line;">
-                    {selected_case['treatment_notes']}
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown("#### ⚠️ 实施建议")
+                st.markdown(f'<div style="background: #fff8e1; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #ffc107; white-space: pre-line;">{selected_case["treatment_notes"]}</div>', unsafe_allow_html=True)
         
         with tab4:
             st.markdown("#### 📝 学习要点总结")
@@ -464,23 +407,17 @@ def render_case_library():
             # 显示关键学习要点
             key_points = ensure_list(
                 selected_case.get('key_points'),
-                ['理解案例核心问题', '掌握分析方法与工具', '学习解决方案设计', '总结管理启示']
+                ['理解案例背景', '分析管理问题', '掌握解决思路']
             )
             for i, point in enumerate(key_points, 1):
-                st.markdown(f"""
-                <div style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); 
-                            padding: 12px 15px; margin: 8px 0; border-radius: 8px; 
-                            border-left: 4px solid #4caf50;">
-                    <strong>要点 {i}：</strong> {point}
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown(f'<div style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); padding: 12px 15px; margin: 8px 0; border-radius: 8px; border-left: 4px solid #4caf50;"><strong>要点 {i}：</strong> {point}</div>', unsafe_allow_html=True)
             
             st.markdown("")
             st.markdown("#### ✏️ 我的学习笔记")
             notes = st.text_area(
                 "记录你对这个案例的理解、疑问和思考",
                 height=150,
-                placeholder="例如：\n1. 这个案例的核心问题是...\n2. 解决方案的关键点是...\n3. 可以应用的管理理论...\n4. 需要进一步学习的内容...",
+                placeholder="例如：\n1. 这个案例的管理问题是...\n2. 解决方案的关键点是...\n3. 需要进一步学习的内容...",
                 key=f"notes_{selected_case['id']}"
             )
             
