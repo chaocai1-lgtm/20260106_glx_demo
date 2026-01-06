@@ -74,85 +74,60 @@ def get_knowledge_graph_data(module_id=None):
 def create_knowledge_graph_viz(module_id=None):
     """创建知识图谱可视化"""
     # 使用浅色背景
-    net = Network(height="1100px", width="100%", bgcolor="#ffffff", font_color="#333333")
+    net = Network(height="900px", width="100%", bgcolor="#ffffff", font_color="#333333")
     
-    # 配置物理引擎 - 优化布局，使用直线，减少交叠
+    # 配置物理引擎 - 参考xjygraph.py的优化配置
+    net.barnes_hut(gravity=-3000, central_gravity=0.3, spring_length=200)
+    
     net.set_options("""
     {
-        "physics": {
-            "enabled": true,
-            "solver": "barnesHut",
-            "barnesHut": {
-                "gravitationalConstant": -35000,
-                "centralGravity": 0.1,
-                "springLength": 250,
-                "springConstant": 0.02,
-                "damping": 0.5,
-                "avoidOverlap": 1
-            },
-            "stabilization": {
-                "enabled": true,
-                "iterations": 200,
-                "fit": true
-            },
-            "minVelocity": 0.75
-        },
-        "layout": {
-            "improvedLayout": true,
-            "randomSeed": 42,
-            "hierarchical": false
-        },
-        "edges": {
-            "smooth": false,
-            "font": {
-                "size": 20,
-                "color": "#000000",
-                "strokeWidth": 0,
-                "align": "middle",
-                "bold": true
-            },
-            "color": {
-                "inherit": false
-            },
-            "width": 2.5,
-            "chosen": {
-                "edge": true
-            },
-            "arrows": {
-                "to": {
-                    "enabled": true,
-                    "scaleFactor": 0.8
-                }
-            }
-        },
         "nodes": {
             "font": {
-                "size": 50,
-                "face": "Arial",
-                "strokeWidth": 3,
-                "strokeColor": "#ffffff",
-                "color": "#000000",
-                "bold": true,
-                "align": "top",
-                "vadjust": -140
+                "size": 160,
+                "color": "#222222",
+                "face": "Microsoft YaHei, SimHei, sans-serif",
+                "bold": true
             },
             "shadow": {
                 "enabled": true,
-                "size": 8,
-                "x": 2,
-                "y": 2
+                "size": 10,
+                "x": 3,
+                "y": 3
             },
             "borderWidth": 2,
-            "borderWidthSelected": 4,
-            "chosen": {
-                "node": true
+            "borderWidthSelected": 5
+        },
+        "edges": {
+            "smooth": false,
+            "width": 1,
+            "color": "#999999",
+            "font": {
+                "size": 20,
+                "color": "#555"
             }
         },
         "interaction": {
             "hover": true,
-            "tooltipDelay": 100,
-            "navigationButtons": true,
-            "keyboard": true
+            "navigationButtons": false,
+            "keyboard": true,
+            "dragNodes": true,
+            "dragView": true,
+            "zoomView": true
+        },
+        "physics": {
+            "enabled": true,
+            "barnesHut": {
+                "gravitationalConstant": -8000,
+                "centralGravity": 0.1,
+                "springLength": 300,
+                "springConstant": 0.01,
+                "avoidOverlap": 1
+            },
+            "stabilization": {
+                "enabled": true,
+                "iterations": 300,
+                "fit": true
+            }
         }
     }
     """)
@@ -276,15 +251,15 @@ def create_knowledge_graph_viz(module_id=None):
         all_knowledge_ids = {}
         
         for m_id, m_info in modules_to_show.items():
-            # 添加模块节点 - 核心节点
+            # 添加模块节点 - 核心节点（增大节点尺寸）
             module_desc = m_info.get('description', '')
             net.add_node(m_id, 
                         label=m_info['name'], 
                         color='#FF6B6B', 
-                        size=120, 
+                        size=80, 
                         title=f"📚 {m_info['name']}\n\n{module_desc}\n\n💡 这是管理学的核心模块之一，包含重要的管理理论和实践应用",
-                        shape='dot', 
-                        borderWidth=4)
+                        borderWidth=2,
+                        font={'size': 160, 'color': '#222222', 'face': 'Microsoft YaHei, SimHei, sans-serif', 'bold': True})
             
             for chapter, knowledge_points in m_info['chapters'].items():
                 c_id = f"{m_id}_{chapter}"
@@ -304,32 +279,34 @@ def create_knowledge_graph_viz(module_id=None):
                 }
                 chapter_desc = chapter_descriptions.get(chapter, f"本章节介绍{chapter}相关内容")
                 
-                # 添加章节节点
+                # 添加章节节点（增大尺寸）
                 net.add_node(c_id, 
                             label=chapter, 
                             color='#4ECDC4', 
-                            size=120,
+                            size=70,
                             title=f"📖 {chapter}\n\n{chapter_desc}\n\n包含知识点：{len(knowledge_points)}个",
-                            shape='dot', 
-                            borderWidth=4)
-                net.add_edge(m_id, c_id, label="包含", title="模块包含章节", width=3, color="#888888", smooth=False)
+                            borderWidth=2,
+                            font={'size': 160, 'color': '#222222', 'face': 'Microsoft YaHei, SimHei, sans-serif', 'bold': True})
+                net.add_edge(m_id, c_id, label="包含", title="模块包含章节", width=1, color="#999999", 
+                           arrows={'to': {'enabled': True, 'scaleFactor': 0.3}})
                 
                 # 添加知识点
                 for k_name in knowledge_points:
                     k_id = f"{c_id}_{k_name}"
                     all_knowledge_ids[k_name] = k_id
                     
-                    # 获取知识点详细说明
+                    # 获取知识点详细说明（增大尺寸）
                     detail = knowledge_details.get(k_name, f"{k_name}是{chapter}中的重要知识点，需要重点掌握。")
                     
                     net.add_node(k_id, 
                                 label=k_name, 
                                 color='#95E1D3', 
-                                size=120,
+                                size=60,
                                 title=f"📝 {k_name}\n\n{detail}\n\n所属章节：{chapter}",
-                                shape='dot', 
-                                borderWidth=4)
-                    net.add_edge(c_id, k_id, label="涵盖", title="章节涵盖知识点", width=2, color="#aaaaaa", smooth=False)
+                                borderWidth=2,
+                                font={'size': 160, 'color': '#222222', 'face': 'Microsoft YaHei, SimHei, sans-serif', 'bold': True})
+                    net.add_edge(c_id, k_id, label="涵盖", title="章节涵盖知识点", width=1, color="#999999",
+                               arrows={'to': {'enabled': True, 'scaleFactor': 0.3}})
         
         # 添加知识点之间的关联边 - 所有边都有标签
         for source, target, relation in knowledge_links:
@@ -339,11 +316,10 @@ def create_knowledge_graph_viz(module_id=None):
                 net.add_edge(source_id, target_id, 
                            label=relation,
                            color="#e91e63", 
-                           width=2.5, 
+                           width=1, 
                            dashes=True,
-                           arrows={'to': {'enabled': True, 'scaleFactor': 0.8}},
-                           title=f"知识关联：{source} {relation} {target}",
-                           smooth=False)
+                           arrows={'to': {'enabled': True, 'scaleFactor': 0.3}},
+                           title=f"知识关联：{source} {relation} {target}")
     else:
         nodes_added = set()
         
@@ -356,10 +332,10 @@ def create_knowledge_graph_viz(module_id=None):
                     m['id'],
                     label=m['name'],
                     color='#FF6B6B',
-                    size=120,
+                    size=80,
                     title=f"📚 {m['name']}\n\n{desc}",
-                    shape='dot',
-                    borderWidth=4
+                    borderWidth=2,
+                    font={'size': 160, 'color': '#222222', 'face': 'Microsoft YaHei, SimHei, sans-serif', 'bold': True}
                 )
                 nodes_added.add(m['id'])
             
@@ -370,19 +346,19 @@ def create_knowledge_graph_viz(module_id=None):
                     c['id'],
                     label=c['name'],
                     color='#4ECDC4',
-                    size=120,
+                    size=70,
                     title=f"📖 {c['name']}\n\n本章节包含多个相关知识点，构成完整的知识体系。",
-                    shape='dot',
-                    borderWidth=4
+                    borderWidth=2,
+                    font={'size': 160, 'color': '#222222', 'face': 'Microsoft YaHei, SimHei, sans-serif', 'bold': True}
                 )
                 nodes_added.add(c['id'])
                 if 'm' in record and record['m']:
                     net.add_edge(record['m']['id'], c['id'], 
                                label="包含", 
                                title="模块包含章节",
-                               width=3, 
-                               color="#888888",
-                               smooth=False)
+                               width=1, 
+                               color="#999999",
+                               arrows={'to': {'enabled': True, 'scaleFactor': 0.3}})
             
             # 添加知识点节点
             if 'k' in record and record['k'] and record['k']['id'] not in nodes_added:
@@ -395,19 +371,19 @@ def create_knowledge_graph_viz(module_id=None):
                     k['id'],
                     label=k_name,
                     color='#95E1D3',
-                    size=120,
+                    size=60,
                     title=f"📝 {k_name}\n\n{k_desc}\n\n难度：{difficulty}",
-                    shape='dot',
-                    borderWidth=4
+                    borderWidth=2,
+                    font={'size': 160, 'color': '#222222', 'face': 'Microsoft YaHei, SimHei, sans-serif', 'bold': True}
                 )
                 nodes_added.add(k['id'])
                 if 'c' in record and record['c']:
                     net.add_edge(record['c']['id'], k['id'], 
                                label="涵盖", 
                                title="章节涵盖知识点",
-                               width=2, 
-                               color="#aaaaaa",
-                               smooth=False)
+                               width=1, 
+                               color="#999999",
+                               arrows={'to': {'enabled': True, 'scaleFactor': 0.3}})
             
             # 添加知识点前置关系 - 确保有标签
             if 'k2' in record and record['k2']:
@@ -420,27 +396,244 @@ def create_knowledge_graph_viz(module_id=None):
                         k2['id'],
                         label=k2_name,
                         color='#95E1D3',
-                        size=120,
+                        size=60,
                         title=f"📝 {k2_name}\n\n{k2_desc}",
-                        shape='dot',
-                        borderWidth=4
+                        borderWidth=2,
+                        font={'size': 160, 'color': '#222222', 'face': 'Microsoft YaHei, SimHei, sans-serif', 'bold': True}
                     )
                     nodes_added.add(k2['id'])
                 if 'k' in record and record['k']:
                     net.add_edge(record['k']['id'], k2['id'], 
                                label="前置", 
                                title=f"前置关系：需要先掌握 {k2['name']}",
-                               arrows='to', 
                                dashes=True, 
                                color="#ff9999", 
-                               width=2.5,
-                               smooth=False)
+                               width=1,
+                               arrows={'to': {'enabled': True, 'scaleFactor': 0.3}})
     
     # 保存并返回HTML
     try:
         net.save_graph("temp_graph.html")
         with open("temp_graph.html", 'r', encoding='utf-8') as f:
             html_content = f.read()
+        
+        # 添加交互式详情面板和高亮功能（参考xjygraph.py）
+        interactive_script = """
+        <style>
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            overflow: hidden !important;
+        }
+        #mynetwork {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        #node-detail-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 380px;
+            max-height: 85vh;
+            background: rgba(255,255,255,0.95);
+            padding: 20px 25px;
+            z-index: 9999;
+            overflow-y: auto;
+            display: none;
+            font-family: 'Microsoft YaHei', sans-serif;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-radius: 12px;
+        }
+        #node-detail-panel h3 {
+            margin: 0 0 15px 0;
+            color: #FF6B6B;
+            font-size: 22px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #FF6B6B;
+        }
+        #node-detail-panel .detail-row {
+            margin: 12px 0;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+        #node-detail-panel .detail-label {
+            font-weight: bold;
+            color: #333;
+        }
+        #node-detail-panel .detail-value {
+            color: #555;
+        }
+        #node-detail-panel .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #999;
+        }
+        #node-detail-panel .close-btn:hover {
+            color: #333;
+        }
+        </style>
+        
+        <div id="node-detail-panel">
+            <span class="close-btn" onclick="closeDetailPanel()">✕</span>
+            <h3 id="detail-title">节点详情</h3>
+            <div id="detail-content"></div>
+        </div>
+        
+        <script>
+        var networkRef = null;
+        var originalColors = {nodes: {}, edges: {}};
+        
+        function closeDetailPanel() {
+            document.getElementById('node-detail-panel').style.display = 'none';
+            if (networkRef) {
+                restoreAllColors();
+            }
+        }
+        
+        function restoreAllColors() {
+            if (!networkRef) return;
+            var nodeUpdates = [];
+            var edgeUpdates = [];
+            
+            for (var nodeId in originalColors.nodes) {
+                nodeUpdates.push({id: nodeId, color: originalColors.nodes[nodeId], font: {color: '#222222'}});
+            }
+            for (var edgeId in originalColors.edges) {
+                edgeUpdates.push({id: edgeId, color: '#999999', font: {color: '#555'}});
+            }
+            
+            if (nodeUpdates.length > 0) {
+                networkRef.body.data.nodes.update(nodeUpdates);
+            }
+            if (edgeUpdates.length > 0) {
+                networkRef.body.data.edges.update(edgeUpdates);
+            }
+            originalColors = {nodes: {}, edges: {}};
+        }
+        
+        function highlightConnected(clickedNodeId) {
+            if (!networkRef) return;
+            
+            restoreAllColors();
+            
+            var connectedNodes = new Set([clickedNodeId]);
+            var connectedEdgeIds = new Set();
+            
+            var allEdges = networkRef.body.data.edges.get();
+            allEdges.forEach(function(edge) {
+                if (edge.from === clickedNodeId || edge.to === clickedNodeId) {
+                    connectedNodes.add(edge.from);
+                    connectedNodes.add(edge.to);
+                    connectedEdgeIds.add(edge.id);
+                }
+            });
+            
+            var allNodes = networkRef.body.data.nodes.get();
+            var nodeUpdates = [];
+            var edgeUpdates = [];
+            
+            originalColors = {nodes: {}, edges: {}};
+            
+            allNodes.forEach(function(node) {
+                originalColors.nodes[node.id] = node.color;
+                if (connectedNodes.has(node.id)) {
+                    nodeUpdates.push({id: node.id, font: {color: '#222222'}});
+                } else {
+                    nodeUpdates.push({id: node.id, color: '#dddddd', font: {color: '#bbbbbb'}});
+                }
+            });
+            
+            allEdges.forEach(function(edge) {
+                originalColors.edges[edge.id] = edge.color;
+                if (connectedEdgeIds.has(edge.id)) {
+                    edgeUpdates.push({id: edge.id, color: '#FF6B6B', font: {color: '#FF6B6B'}});
+                } else {
+                    edgeUpdates.push({id: edge.id, color: '#eeeeee', font: {color: '#cccccc'}});
+                }
+            });
+            
+            networkRef.body.data.nodes.update(nodeUpdates);
+            networkRef.body.data.edges.update(edgeUpdates);
+        }
+        
+        function showNodeDetail(nodeId, nodeLabel, nodeTitle) {
+            var panel = document.getElementById('node-detail-panel');
+            var title = document.getElementById('detail-title');
+            var content = document.getElementById('detail-content');
+            
+            title.innerText = '📍 ' + nodeLabel;
+            
+            var html = '<div class="detail-row"><span class="detail-label">节点ID：</span><span class="detail-value">' + nodeId + '</span></div>';
+            
+            if (nodeTitle) {
+                var titleLines = nodeTitle.split('\\n');
+                titleLines.forEach(function(line) {
+                    if (line.trim()) {
+                        html += '<div class="detail-row"><span class="detail-value">' + line + '</span></div>';
+                    }
+                });
+            }
+            
+            content.innerHTML = html;
+            panel.style.display = 'block';
+        }
+        
+        window.onload = function() {
+            var attempts = 0;
+            var maxAttempts = 20;
+            
+            function tryBindEvents() {
+                attempts++;
+                var networkObj = null;
+                
+                if (typeof network !== 'undefined') {
+                    networkObj = network;
+                } else if (typeof window.network !== 'undefined') {
+                    networkObj = window.network;
+                }
+                
+                if (networkObj) {
+                    networkRef = networkObj;
+                    
+                    // 稳定后禁用物理引擎
+                    networkObj.on('stabilized', function() {
+                        networkObj.setOptions({physics: {enabled: false}});
+                    });
+                    
+                    // 点击事件
+                    networkObj.on('click', function(params) {
+                        if (params.nodes && params.nodes.length > 0) {
+                            var nodeId = params.nodes[0];
+                            var node = networkObj.body.nodes[nodeId];
+                            if (node) {
+                                var label = node.options.label || nodeId;
+                                var title = node.options.title || '';
+                                showNodeDetail(nodeId, label, title);
+                                highlightConnected(nodeId);
+                            }
+                        } else {
+                            closeDetailPanel();
+                        }
+                    });
+                } else if (attempts < maxAttempts) {
+                    setTimeout(tryBindEvents, 300);
+                }
+            }
+            
+            setTimeout(tryBindEvents, 500);
+        };
+        </script>
+        """
+        
+        html_content = html_content.replace("</body>", interactive_script + "</body>")
+        
         return html_content
     except Exception:
         return "<div style='padding:20px;text-align:center;'>知识图谱生成中...</div>"
@@ -485,7 +678,7 @@ def render_knowledge_graph():
     # 生成并显示图谱
     with st.spinner("生成知识图谱中..."):
         html_content = create_knowledge_graph_viz(module_id)
-        components.html(html_content, height=1200)
+        components.html(html_content, height=1000, scrolling=False)
     
     # 学习进度标记
     st.sidebar.title("📊 学习进度")
