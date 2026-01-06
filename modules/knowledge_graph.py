@@ -83,10 +83,8 @@ def create_knowledge_graph_viz(module_id=None):
     {
         "nodes": {
             "font": {
-                "size": 160,
-                "color": "#222222",
-                "face": "Microsoft YaHei, SimHei, sans-serif",
-                "bold": true
+                "size": 20,
+                "face": "Microsoft YaHei, SimHei, sans-serif"
             },
             "shadow": {
                 "enabled": true,
@@ -258,8 +256,7 @@ def create_knowledge_graph_viz(module_id=None):
                         color='#FF6B6B', 
                         size=80, 
                         title=f"📚 {m_info['name']}\n\n{module_desc}\n\n💡 这是管理学的核心模块之一，包含重要的管理理论和实践应用",
-                        borderWidth=2,
-                        font={'size': 160, 'color': '#222222', 'face': 'Microsoft YaHei, SimHei, sans-serif', 'bold': True})
+                        borderWidth=2)
             
             for chapter, knowledge_points in m_info['chapters'].items():
                 c_id = f"{m_id}_{chapter}"
@@ -285,8 +282,7 @@ def create_knowledge_graph_viz(module_id=None):
                             color='#4ECDC4', 
                             size=70,
                             title=f"📖 {chapter}\n\n{chapter_desc}\n\n包含知识点：{len(knowledge_points)}个",
-                            borderWidth=2,
-                            font={'size': 160, 'color': '#222222', 'face': 'Microsoft YaHei, SimHei, sans-serif', 'bold': True})
+                            borderWidth=2)
                 net.add_edge(m_id, c_id, label="包含", title="模块包含章节", width=1, color="#999999", 
                            arrows={'to': {'enabled': True, 'scaleFactor': 0.3}})
                 
@@ -303,8 +299,7 @@ def create_knowledge_graph_viz(module_id=None):
                                 color='#95E1D3', 
                                 size=60,
                                 title=f"📝 {k_name}\n\n{detail}\n\n所属章节：{chapter}",
-                                borderWidth=2,
-                                font={'size': 160, 'color': '#222222', 'face': 'Microsoft YaHei, SimHei, sans-serif', 'bold': True})
+                                borderWidth=2)
                     net.add_edge(c_id, k_id, label="涵盖", title="章节涵盖知识点", width=1, color="#999999",
                                arrows={'to': {'enabled': True, 'scaleFactor': 0.3}})
         
@@ -334,8 +329,7 @@ def create_knowledge_graph_viz(module_id=None):
                     color='#FF6B6B',
                     size=80,
                     title=f"📚 {m['name']}\n\n{desc}",
-                    borderWidth=2,
-                    font={'size': 160, 'color': '#222222', 'face': 'Microsoft YaHei, SimHei, sans-serif', 'bold': True}
+                    borderWidth=2
                 )
                 nodes_added.add(m['id'])
             
@@ -348,8 +342,7 @@ def create_knowledge_graph_viz(module_id=None):
                     color='#4ECDC4',
                     size=70,
                     title=f"📖 {c['name']}\n\n本章节包含多个相关知识点，构成完整的知识体系。",
-                    borderWidth=2,
-                    font={'size': 160, 'color': '#222222', 'face': 'Microsoft YaHei, SimHei, sans-serif', 'bold': True}
+                    borderWidth=2
                 )
                 nodes_added.add(c['id'])
                 if 'm' in record and record['m']:
@@ -373,8 +366,7 @@ def create_knowledge_graph_viz(module_id=None):
                     color='#95E1D3',
                     size=60,
                     title=f"📝 {k_name}\n\n{k_desc}\n\n难度：{difficulty}",
-                    borderWidth=2,
-                    font={'size': 160, 'color': '#222222', 'face': 'Microsoft YaHei, SimHei, sans-serif', 'bold': True}
+                    borderWidth=2
                 )
                 nodes_added.add(k['id'])
                 if 'c' in record and record['c']:
@@ -398,8 +390,7 @@ def create_knowledge_graph_viz(module_id=None):
                         color='#95E1D3',
                         size=60,
                         title=f"📝 {k2_name}\n\n{k2_desc}",
-                        borderWidth=2,
-                        font={'size': 160, 'color': '#222222', 'face': 'Microsoft YaHei, SimHei, sans-serif', 'bold': True}
+                        borderWidth=2
                     )
                     nodes_added.add(k2['id'])
                 if 'k' in record and record['k']:
