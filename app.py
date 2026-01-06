@@ -1190,9 +1190,16 @@ def render_module_analytics(module_name):
                         if details and 'glx_ability_' in str(details):
                             for aid, aname in ABILITY_ID_TO_NAME.items():
                                 details = str(details).replace(aid, aname)
+                        
+                        # 替换医学术语为管理学术语
+                        activity_type = act['activity_type']
+                        activity_type = activity_type.replace('查看病例', '查看案例')
+                        activity_type = activity_type.replace('保存病例', '保存案例')
+                        activity_type = activity_type.replace('病例', '案例')
+                        
                         records.append({
                             "时间": act['timestamp'],
-                            "活动类型": act['activity_type'],
+                            "活动类型": activity_type,
                             "内容": content,
                             "详情": details
                         })

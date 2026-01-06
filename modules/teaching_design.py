@@ -81,8 +81,8 @@ def get_chapter_knowledge_points(chapter_id):
         with driver.session() as session:
             result = session.run("""
                 MATCH (c:glx_Chapter {id: $chapter_id})-[:HAS_KNOWLEDGE]->(k:glx_Knowledge)
-                RETURN k.name as name, k.importance as importance
-                ORDER BY k.importance DESC
+                RETURN k.name as name, COALESCE(k.importance, 80) as importance
+                ORDER BY COALESCE(k.importance, 80) DESC
             """, chapter_id=chapter_id)
             knowledge_points = [dict(record) for record in result]
         return knowledge_points
@@ -197,6 +197,11 @@ def render_teaching_design():
     # 获取所有章节
     chapters = get_all_chapters()
     
+    # 初始化变量
+    selected_chapter = None
+    selected_chapter_name = None
+    selected_method = None
+    
     # 布局
     col1, col2 = st.columns(2)
     
@@ -234,7 +239,11 @@ def render_teaching_design():
                     if knowledge_points:
                         st.markdown("**包含知识点：**")
                         for kp in knowledge_points:
-                            importance = kp.get('importance', 80)
+                            # 处理 importance 可能为 None 的情况
+                            importance = kp.get('importance')
+                            if importance is None:
+                                importance = 80  # 默认值
+                            
                             if importance >= 100:
                                 st.markdown(f"- 🔴 {kp['name']}（核心）")
                             elif importance >= 90:
