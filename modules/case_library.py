@@ -208,7 +208,7 @@ def render_case_library():
     st.markdown("""
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; color: white; margin-bottom: 20px;">
         <h3 style="margin: 0; color: white;">📚 管理学案例库</h3>
-        <p style="margin: 10px 0 0 0; opacity: 0.9;">通过真实管理案例学习，掌握管理理论与实践的核心技能</p>
+        <p style="margin: 10px 0 0 0; opacity: 0.9; color: white;">通过真实管理案例学习，掌握管理理论与实践的核心技能</p>
     </div>
     """, unsafe_allow_html=True)
     
